@@ -1,0 +1,3711 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AI Resume Generator | Powered by CrewAI</title>
+        <meta
+            name="description"
+            content="Generate a professional, ATS-optimized resume using AI agents. Just fill in your details and let CrewAI craft your perfect resume."
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            /* ============================================================
+   STYLES EMBEDDED - See full CSS at bottom of file
+   ============================================================ */
+            :root {
+                --bg-deep: #0a0812;
+                --bg-mid: #100d1f;
+                --accent-1: #7c3aed;
+                --accent-2: #06b6d4;
+                --accent-3: #f59e0b;
+                --glass-bg: rgba(255, 255, 255, 0.04);
+                --glass-border: rgba(255, 255, 255, 0.1);
+                --glass-hover: rgba(255, 255, 255, 0.07);
+                --text-primary: #f0eeff;
+                --text-secondary: #a99fc4;
+                --text-muted: #665f84;
+                --success: #10b981;
+                --danger: #ef4444;
+                --radius-sm: 8px;
+                --radius-md: 14px;
+                --radius-lg: 20px;
+                --radius-xl: 28px;
+                --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
+                --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+            body {
+                font-family: "Inter", "Outfit", sans-serif;
+                background: var(--bg-deep);
+                color: var(--text-primary);
+                min-height: 100vh;
+                overflow-x: hidden;
+                line-height: 1.6;
+            }
+            .bg-orbs {
+                position: fixed;
+                inset: 0;
+                z-index: 0;
+                pointer-events: none;
+                overflow: hidden;
+            }
+            .orb {
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(80px);
+                opacity: 0.18;
+                animation: float-orb 12s ease-in-out infinite alternate;
+            }
+            .orb-1 {
+                width: 600px;
+                height: 600px;
+                background: radial-gradient(circle, #7c3aed, transparent 70%);
+                top: -200px;
+                left: -150px;
+                animation-duration: 14s;
+            }
+            .orb-2 {
+                width: 500px;
+                height: 500px;
+                background: radial-gradient(circle, #06b6d4, transparent 70%);
+                bottom: -150px;
+                right: -100px;
+                animation-duration: 18s;
+                animation-delay: -6s;
+            }
+            .orb-3 {
+                width: 400px;
+                height: 400px;
+                background: radial-gradient(circle, #f59e0b, transparent 70%);
+                top: 40%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                animation-duration: 22s;
+                animation-delay: -10s;
+            }
+            @keyframes float-orb {
+                0% {
+                    transform: translate(0, 0) scale(1);
+                }
+                50% {
+                    transform: translate(40px, -30px) scale(1.1);
+                }
+                100% {
+                    transform: translate(-30px, 50px) scale(0.95);
+                }
+            }
+            .site-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.9rem 2rem;
+                background: rgba(10, 8, 18, 0.7);
+                backdrop-filter: blur(20px);
+                border-bottom: 1px solid var(--glass-border);
+            }
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                font-family: "Outfit", sans-serif;
+                font-weight: 700;
+                font-size: 1.2rem;
+                color: var(--text-primary);
+                text-decoration: none;
+            }
+            .logo-icon {
+                width: 36px;
+                height: 36px;
+                background: linear-gradient(
+                    135deg,
+                    var(--accent-1),
+                    var(--accent-2)
+                );
+                border-radius: var(--radius-sm);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+            }
+            .header-badge {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.35rem 0.85rem;
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                border-radius: 99px;
+                font-size: 0.78rem;
+                color: var(--text-secondary);
+                font-weight: 500;
+            }
+            .pulse-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: var(--success);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+                }
+                70% {
+                    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+                }
+            }
+            .main-container {
+                position: relative;
+                z-index: 1;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 5.5rem 1rem 3rem;
+            }
+            .hero {
+                text-align: center;
+                max-width: 760px;
+                padding: 3rem 1rem;
+                animation: fade-up 0.8s ease forwards;
+            }
+            .hero-title {
+                font-family: "Outfit", sans-serif;
+                font-size: clamp(2rem, 5vw, 3.6rem);
+                font-weight: 800;
+                line-height: 1.15;
+                letter-spacing: -0.02em;
+                margin-bottom: 1.2rem;
+            }
+            .gradient-text {
+                background: linear-gradient(
+                    135deg,
+                    var(--accent-1),
+                    var(--accent-2),
+                    #a78bfa
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            .hero-subtitle {
+                font-size: 1.05rem;
+                color: var(--text-secondary);
+                max-width: 560px;
+                margin: 0 auto 2rem;
+                line-height: 1.7;
+            }
+            .hero-features {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.6rem;
+                justify-content: center;
+                margin-bottom: 2.5rem;
+            }
+            .feature-chip {
+                padding: 0.4rem 1rem;
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                border-radius: 99px;
+                font-size: 0.82rem;
+                color: var(--text-secondary);
+                font-weight: 500;
+                transition: var(--transition);
+            }
+            .feature-chip:hover {
+                background: var(--glass-hover);
+                color: var(--text-primary);
+                border-color: rgba(124, 58, 237, 0.4);
+            }
+            .btn-primary {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.6rem;
+                padding: 0.75rem 1.75rem;
+                background: linear-gradient(135deg, var(--accent-1), #5b21b6);
+                color: #fff;
+                border: none;
+                border-radius: var(--radius-md);
+                font-size: 0.95rem;
+                font-weight: 600;
+                font-family: "Inter", sans-serif;
+                cursor: pointer;
+                transition: var(--transition);
+                position: relative;
+                overflow: hidden;
+            }
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+            }
+            .btn-large {
+                padding: 1rem 2.2rem;
+                font-size: 1.05rem;
+                border-radius: var(--radius-lg);
+            }
+            .btn-generate {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.6rem;
+                padding: 0.9rem 2rem;
+                background: linear-gradient(135deg, #7c3aed, #06b6d4);
+                color: #fff;
+                border: none;
+                border-radius: var(--radius-md);
+                font-size: 1rem;
+                font-weight: 700;
+                font-family: "Inter", sans-serif;
+                cursor: pointer;
+                transition: var(--transition);
+                animation: glow-pulse 3s infinite;
+            }
+            @keyframes glow-pulse {
+                0%,
+                100% {
+                    box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+                }
+                50% {
+                    box-shadow: 0 0 40px rgba(6, 182, 212, 0.5);
+                }
+            }
+            .btn-generate:hover {
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 12px 40px rgba(124, 58, 237, 0.6);
+            }
+            .btn-ghost {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.7rem 1.4rem;
+                background: transparent;
+                color: var(--text-secondary);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius-md);
+                font-size: 0.9rem;
+                font-weight: 500;
+                font-family: "Inter", sans-serif;
+                cursor: pointer;
+                transition: var(--transition);
+            }
+            .btn-ghost:hover {
+                background: var(--glass-hover);
+                color: var(--text-primary);
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+            .btn-add {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.65rem 1.3rem;
+                background: rgba(124, 58, 237, 0.1);
+                color: #a78bfa;
+                border: 1px dashed rgba(124, 58, 237, 0.4);
+                border-radius: var(--radius-md);
+                font-size: 0.9rem;
+                font-weight: 600;
+                font-family: "Inter", sans-serif;
+                cursor: pointer;
+                transition: var(--transition);
+                margin-top: 1rem;
+            }
+            .btn-add:hover {
+                background: rgba(124, 58, 237, 0.2);
+                border-color: rgba(124, 58, 237, 0.7);
+                color: #c4b5fd;
+            }
+            .btn-action {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.6rem;
+                padding: 0.75rem 1.4rem;
+                background: linear-gradient(
+                    135deg,
+                    rgba(124, 58, 237, 0.1),
+                    rgba(6, 182, 212, 0.05)
+                );
+                color: var(--text-secondary);
+                border: 1.5px solid rgba(124, 58, 237, 0.3);
+                border-radius: var(--radius-sm);
+                font-size: 0.9rem;
+                font-weight: 600;
+                font-family: "Inter", sans-serif;
+                cursor: pointer;
+                transition: var(--transition);
+            }
+            .btn-action:hover {
+                background: linear-gradient(
+                    135deg,
+                    rgba(124, 58, 237, 0.2),
+                    rgba(6, 182, 212, 0.1)
+                );
+                color: var(--text-primary);
+                border-color: var(--accent-1);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2);
+            }
+            .form-container {
+                width: 100%;
+                max-width: 760px;
+                animation: fade-up 0.5s ease forwards;
+            }
+            .progress-wrapper {
+                margin-bottom: 2.5rem;
+            }
+            .steps-nav {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0;
+                margin-bottom: 1rem;
+            }
+            .step-dot {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.3rem;
+                cursor: default;
+            }
+            .step-num {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background: var(--glass-bg);
+                border: 2px solid var(--glass-border);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: var(--text-muted);
+                transition: var(--transition);
+            }
+            .step-dot.active .step-num {
+                background: linear-gradient(135deg, var(--accent-1), #5b21b6);
+                border-color: transparent;
+                color: white;
+                box-shadow: 0 4px 15px rgba(124, 58, 237, 0.5);
+            }
+            .step-dot.completed .step-num {
+                background: var(--success);
+                border-color: transparent;
+                color: white;
+            }
+            .step-label {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                font-weight: 500;
+                white-space: nowrap;
+                transition: var(--transition);
+            }
+            .step-dot.active .step-label {
+                color: #a78bfa;
+            }
+            .step-dot.completed .step-label {
+                color: var(--success);
+            }
+            .step-line {
+                height: 2px;
+                flex: 1;
+                max-width: 80px;
+                background: var(--glass-border);
+                margin: 0 4px;
+                margin-bottom: 22px;
+                transition: var(--transition);
+            }
+            .step-line.completed {
+                background: var(--success);
+            }
+            .step-line.active {
+                background: linear-gradient(
+                    90deg,
+                    var(--accent-1),
+                    var(--accent-2)
+                );
+            }
+            .progress-bar-track {
+                height: 4px;
+                background: var(--glass-border);
+                border-radius: 99px;
+                overflow: hidden;
+            }
+            .progress-bar-fill {
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    var(--accent-1),
+                    var(--accent-2)
+                );
+                border-radius: 99px;
+                width: 0%;
+                transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .step-panel {
+                display: none;
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.03),
+                    rgba(124, 58, 237, 0.01)
+                );
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius-xl);
+                padding: 3rem;
+                backdrop-filter: blur(20px);
+                animation: slide-in 0.4s ease forwards;
+            }
+            .step-panel.active {
+                display: block;
+            }
+            @keyframes slide-in {
+                from {
+                    opacity: 0;
+                    transform: translateX(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+            @keyframes slide-out {
+                from {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateX(-30px);
+                }
+            }
+            .step-header {
+                text-align: center;
+                margin-bottom: 2.5rem;
+            }
+            .step-icon {
+                font-size: 3rem;
+                margin-bottom: 0.8rem;
+                display: block;
+                animation: bounce-icon 2s ease-in-out infinite;
+            }
+            @keyframes bounce-icon {
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-8px);
+                }
+            }
+            .step-header h2 {
+                font-family: "Outfit", sans-serif;
+                font-size: 2rem;
+                font-weight: 800;
+                margin-bottom: 0.6rem;
+                background: linear-gradient(135deg, #06b6d4, #a78bfa);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            .step-header p {
+                color: var(--text-secondary);
+                font-size: 1rem;
+                line-height: 1.6;
+                opacity: 0.85;
+            }
+            .form-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.25rem;
+            }
+            .field-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.6rem;
+            }
+            .field-group.full-width {
+                grid-column: 1 / -1;
+            }
+            label {
+                font-size: 0.88rem;
+                font-weight: 700;
+                color: var(--text-secondary);
+                letter-spacing: 0.02em;
+                text-transform: capitalize;
+            }
+            .required {
+                color: var(--accent-1);
+            }
+            .optional {
+                color: var(--text-muted);
+                font-weight: 400;
+            }
+            input[type="text"],
+            input[type="email"],
+            input[type="tel"],
+            input[type="url"],
+            textarea {
+                width: 100%;
+                padding: 0.9rem 1.1rem;
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.04),
+                    rgba(124, 58, 237, 0.02)
+                );
+                border: 1.5px solid var(--glass-border);
+                border-radius: var(--radius-sm);
+                color: var(--text-primary);
+                font-size: 0.95rem;
+                font-family: "Inter", sans-serif;
+                transition: var(--transition);
+                outline: none;
+                resize: vertical;
+            }
+            input::placeholder,
+            textarea::placeholder {
+                color: var(--text-muted);
+                opacity: 0.7;
+            }
+            input:focus,
+            textarea:focus {
+                border-color: var(--accent-1);
+                background: rgba(124, 58, 237, 0.12);
+                box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2);
+            }
+            .char-count {
+                text-align: right;
+                font-size: 0.8rem;
+                color: var(--text-muted);
+            }
+            .field-hint {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                margin-top: 0.3rem;
+            }
+            .step-actions {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 2.5rem;
+                padding-top: 2rem;
+                border-top: 1px solid var(--glass-border);
+            }
+            .entry-card {
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.04),
+                    rgba(124, 58, 237, 0.01)
+                );
+                border: 1.5px solid var(--glass-border);
+                border-radius: var(--radius-md);
+                padding: 1.6rem;
+                margin-bottom: 1.2rem;
+                position: relative;
+                transition: var(--transition);
+                animation: fade-up 0.3s ease forwards;
+            }
+            .entry-card:hover {
+                border-color: rgba(124, 58, 237, 0.4);
+                background: linear-gradient(
+                    135deg,
+                    rgba(124, 58, 237, 0.06),
+                    rgba(6, 182, 212, 0.02)
+                );
+                box-shadow: 0 8px 25px rgba(124, 58, 237, 0.1);
+            }
+            .entry-card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.2rem;
+            }
+            .entry-card-title {
+                font-weight: 800;
+                font-size: 0.98rem;
+                color: #a78bfa;
+                letter-spacing: 0.02em;
+            }
+            .btn-remove {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: rgba(239, 68, 68, 0.12);
+                border: 1.5px solid rgba(239, 68, 68, 0.35);
+                color: #ef4444;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+                line-height: 1;
+                transition: var(--transition);
+                font-weight: 700;
+            }
+            .btn-remove:hover {
+                background: rgba(239, 68, 68, 0.25);
+                border-color: #ef4444;
+                box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+            }
+            .entry-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+            .skill-input-wrapper {
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.04),
+                    rgba(124, 58, 237, 0.02)
+                );
+                border: 1.5px solid var(--glass-border);
+                border-radius: var(--radius-sm);
+                padding: 0.8rem 1rem;
+                transition: var(--transition);
+            }
+            .skill-input-wrapper:focus-within {
+                border-color: var(--accent-1);
+                box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2);
+                background: rgba(124, 58, 237, 0.08);
+            }
+            .skill-input-wrapper input {
+                background: transparent;
+                border: none;
+                box-shadow: none;
+                padding: 0.25rem 0;
+                font-size: 0.95rem;
+                color: var(--text-primary);
+                width: 100%;
+                outline: none;
+            }
+            .skill-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.6rem;
+                margin-top: 0.9rem;
+                min-height: 10px;
+            }
+            .skill-tag {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.45rem 0.85rem;
+                background: linear-gradient(
+                    135deg,
+                    rgba(124, 58, 237, 0.2),
+                    rgba(6, 182, 212, 0.1)
+                );
+                border: 1.5px solid rgba(124, 58, 237, 0.4);
+                border-radius: 99px;
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: #c4b5fd;
+                animation: tag-pop 0.2s ease;
+                letter-spacing: 0.01em;
+            }
+            @keyframes tag-pop {
+                from {
+                    transform: scale(0.7);
+                    opacity: 0;
+                }
+                to {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+            .tag-remove {
+                background: none;
+                border: none;
+                color: #a78bfa;
+                cursor: pointer;
+                font-size: 1.1rem;
+                line-height: 1;
+                padding: 0;
+                transition: var(--transition);
+                font-weight: 700;
+            }
+            .tag-remove:hover {
+                color: var(--danger);
+                transform: scale(1.2);
+            }
+            .style-picker {
+                display: flex;
+                gap: 1rem;
+                margin-top: 0.7rem;
+            }
+            .style-card {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.9rem;
+                padding: 1.2rem;
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.04),
+                    rgba(124, 58, 237, 0.01)
+                );
+                border: 2px solid var(--glass-border);
+                border-radius: var(--radius-md);
+                cursor: pointer;
+                transition: var(--transition);
+                font-size: 0.88rem;
+                font-weight: 700;
+                color: var(--text-secondary);
+            }
+            .style-card input[type="radio"] {
+                display: none;
+            }
+            .style-card.active,
+            .style-card:has(input:checked) {
+                border-color: var(--accent-1);
+                background: linear-gradient(
+                    135deg,
+                    rgba(124, 58, 237, 0.15),
+                    rgba(6, 182, 212, 0.05)
+                );
+                color: #c4b5fd;
+                box-shadow: 0 0 25px rgba(124, 58, 237, 0.25);
+            }
+            .style-card:hover {
+                border-color: rgba(124, 58, 237, 0.6);
+                background: linear-gradient(
+                    135deg,
+                    rgba(124, 58, 237, 0.1),
+                    rgba(6, 182, 212, 0.05)
+                );
+            }
+            .style-preview {
+                width: 100%;
+                height: 70px;
+                background: rgba(255, 255, 255, 0.04);
+                border-radius: var(--radius-sm);
+                overflow: hidden;
+                position: relative;
+            }
+            .modern-preview .prev-header {
+                height: 20px;
+                background: linear-gradient(
+                    90deg,
+                    var(--accent-1),
+                    var(--accent-2)
+                );
+                border-radius: 4px 4px 0 0;
+            }
+            .modern-preview .prev-lines {
+                padding: 8px;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            .modern-preview .prev-lines div {
+                height: 5px;
+                background: rgba(255, 255, 255, 0.12);
+                border-radius: 3px;
+            }
+            .skill-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 0.75rem;
+                min-height: 10px;
+            }
+            .skill-tag {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                padding: 0.35rem 0.75rem;
+                background: rgba(124, 58, 237, 0.15);
+                border: 1px solid rgba(124, 58, 237, 0.35);
+                border-radius: 99px;
+                font-size: 0.82rem;
+                font-weight: 600;
+                color: #c4b5fd;
+            }
+            .loading-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 200;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(10, 8, 18, 0.85);
+                backdrop-filter: blur(12px);
+                animation: fade-in 0.3s ease;
+            }
+            .loading-card {
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius-xl);
+                padding: 3rem;
+                max-width: 420px;
+                width: 90%;
+                text-align: center;
+                backdrop-filter: blur(30px);
+                box-shadow:
+                    var(--shadow-glass),
+                    0 0 80px rgba(124, 58, 237, 0.15);
+                animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)
+                    forwards;
+            }
+            @keyframes pop-in {
+                from {
+                    transform: scale(0.8);
+                    opacity: 0;
+                }
+                to {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+            .agent-animation {
+                position: relative;
+                width: 100px;
+                height: 100px;
+                margin: 0 auto 1.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .agent-ring {
+                position: absolute;
+                inset: 0;
+                border-radius: 50%;
+                border: 3px solid transparent;
+                border-top-color: var(--accent-1);
+                border-right-color: var(--accent-2);
+                animation: spin 1.5s linear infinite;
+            }
+            .ring-2 {
+                inset: 12px;
+                border-top-color: var(--accent-2);
+                border-right-color: var(--accent-1);
+                animation-direction: reverse;
+                animation-duration: 2s;
+            }
+            .agent-icon {
+                font-size: 2.2rem;
+                animation: agent-pulse 1.5s ease-in-out infinite;
+            }
+            @keyframes spin {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+            @keyframes agent-pulse {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.15);
+                }
+            }
+            .loading-card h3 {
+                font-family: "Outfit", sans-serif;
+                font-size: 1.4rem;
+                font-weight: 700;
+                margin-bottom: 0.4rem;
+            }
+            .loading-card p {
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
+            }
+            .loading-steps {
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: left;
+            }
+            .load-step {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.6rem 0.9rem;
+                background: rgba(255, 255, 255, 0.03);
+                border-radius: var(--radius-sm);
+                font-size: 0.85rem;
+                color: var(--text-muted);
+                transition: var(--transition);
+                border: 1px solid transparent;
+            }
+            .load-step.active {
+                color: var(--text-primary);
+                border-color: rgba(124, 58, 237, 0.3);
+                background: rgba(124, 58, 237, 0.08);
+            }
+            .load-step.done {
+                color: var(--success);
+                border-color: rgba(16, 185, 129, 0.2);
+                background: rgba(16, 185, 129, 0.04);
+            }
+            .load-step-dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: var(--glass-border);
+                flex-shrink: 0;
+                transition: var(--transition);
+            }
+            .load-step.active .load-step-dot {
+                background: var(--accent-1);
+                box-shadow: 0 0 8px rgba(124, 58, 237, 0.7);
+                animation: pulse 1s infinite;
+            }
+            .load-step.done .load-step-dot {
+                background: var(--success);
+                box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+            }
+            .result-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.8rem;
+                margin-bottom: 2rem;
+            }
+            .btn-find-internships {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.6rem;
+                padding: 0.75rem 1.5rem;
+                background: linear-gradient(
+                    135deg,
+                    var(--accent-2),
+                    var(--accent-1)
+                );
+                color: #fff;
+                border: none;
+                border-radius: var(--radius-sm);
+                font-size: 0.9rem;
+                font-weight: 700;
+                font-family: "Inter", sans-serif;
+                cursor: pointer;
+                transition: var(--transition);
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+                animation: glow-cyan 3s infinite;
+            }
+            @keyframes glow-cyan {
+                0%,
+                100% {
+                    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+                }
+                50% {
+                    box-shadow: 0 4px 28px rgba(124, 58, 237, 0.5);
+                }
+            }
+            .btn-find-internships:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(6, 182, 212, 0.5);
+            }
+            .btn-find-internships:disabled {
+                opacity: 0.55;
+                cursor: not-allowed;
+                transform: none;
+                animation: none;
+            }
+            .resume-preview {
+                background: linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.04),
+                    rgba(124, 58, 237, 0.02)
+                );
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius-md);
+                padding: 2.5rem;
+                font-family:
+                    "Inter",
+                    -apple-system,
+                    sans-serif;
+                line-height: 1.9;
+                max-height: 600px;
+                overflow-y: auto;
+                scrollbar-width: thin;
+                scrollbar-color: var(--accent-1) transparent;
+                color: var(--text-primary);
+                letter-spacing: 0.3px;
+            }
+            .resume-preview::-webkit-scrollbar {
+                width: 8px;
+            }
+            .resume-preview::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .resume-preview::-webkit-scrollbar-thumb {
+                background: linear-gradient(
+                    180deg,
+                    var(--accent-1),
+                    var(--accent-2)
+                );
+                border-radius: 4px;
+            }
+            .resume-preview::-webkit-scrollbar-thumb:hover {
+                background: linear-gradient(
+                    180deg,
+                    var(--accent-2),
+                    var(--accent-1)
+                );
+            }
+            .resume-preview h1 {
+                font-family: "Outfit", sans-serif;
+                font-size: 2rem;
+                font-weight: 900;
+                letter-spacing: -0.5px;
+                margin-bottom: 0.4rem;
+                margin-top: 0;
+                background: linear-gradient(135deg, #06b6d4, #a78bfa);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            .resume-preview > p:first-of-type {
+                color: #94a3b8;
+                font-size: 0.88rem;
+                margin-bottom: 1.5rem;
+                letter-spacing: 0.5px;
+                opacity: 0.85;
+            }
+            .resume-preview h2 {
+                font-family: "Outfit", sans-serif;
+                font-size: 1.3rem;
+                font-weight: 900;
+                background: linear-gradient(
+                    90deg,
+                    var(--accent-1),
+                    var(--accent-2)
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                border-bottom: 2.5px solid;
+                border-image: linear-gradient(
+                        90deg,
+                        var(--accent-1),
+                        var(--accent-2),
+                        transparent
+                    )
+                    1;
+                padding-bottom: 0.8rem;
+                margin: 2.5rem 0 1.5rem 0;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
+            .resume-preview h2:first-of-type {
+                margin-top: 0;
+            }
+            .resume-preview h3 {
+                font-size: 1.15rem;
+                font-weight: 800;
+                color: var(--accent-2);
+                margin: 1.5rem 0 0.6rem;
+                letter-spacing: 0.03em;
+                position: relative;
+                display: inline-block;
+            }
+            .resume-preview h3::after {
+                content: "";
+                position: absolute;
+                bottom: -4px;
+                left: 0;
+                width: 40px;
+                height: 3px;
+                background: var(--accent-2);
+                border-radius: 2px;
+            }
+            .resume-preview p {
+                color: #cbd5e1;
+                margin-bottom: 1rem;
+                font-size: 0.95rem;
+                line-height: 1.8;
+            }
+            .resume-preview ul {
+                padding-left: 1.6rem;
+                margin-bottom: 1.2rem;
+                margin-top: 0.6rem;
+            }
+            .resume-preview li {
+                color: #d1d5db;
+                font-size: 0.92rem;
+                margin-bottom: 0.8rem;
+                line-height: 1.8;
+                position: relative;
+            }
+            .resume-preview li::marker {
+                color: var(--accent-1);
+                font-weight: 700;
+            }
+            .resume-preview strong {
+                color: #fcd34d;
+                font-weight: 800;
+                text-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+            }
+            .resume-preview em {
+                color: #34d399;
+                font-style: italic;
+                font-weight: 700;
+                background: rgba(52, 211, 153, 0.15);
+                padding: 0.1rem 0.5rem;
+                border-radius: 4px;
+                border: 1px solid rgba(52, 211, 153, 0.3);
+            }
+            .resume-preview code {
+                background: rgba(124, 58, 237, 0.15);
+                color: #a78bfa;
+                padding: 0.25rem 0.5rem;
+                border-radius: 3px;
+                font-family: "Monaco", "Menlo", monospace;
+                font-size: 0.88rem;
+                border-left: 2px solid #a78bfa;
+                margin: 0 0.2rem;
+            }
+            .resume-preview pre {
+                background: rgba(15, 23, 42, 0.8);
+                border: 1px solid rgba(124, 58, 237, 0.3);
+                border-radius: 6px;
+                padding: 1rem;
+                margin: 1rem 0;
+                color: #a78bfa;
+                font-family: "Monaco", monospace;
+                overflow-x: auto;
+            }
+            .resume-preview pre code {
+                background: none;
+                color: #a78bfa;
+                padding: 0;
+                margin: 0;
+                border: none;
+            }
+            .resume-preview a {
+                color: #06b6d4;
+                text-decoration: underline;
+                text-decoration-color: rgba(6, 182, 212, 0.4);
+                transition: all 0.3s ease;
+            }
+            .resume-preview a:hover {
+                color: #22d3ee;
+                text-decoration-color: #22d3ee;
+                text-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
+            }
+            .resume-preview hr {
+                border: none;
+                border-top: 2px solid;
+                border-image: linear-gradient(
+                        90deg,
+                        var(--accent-1),
+                        var(--accent-2),
+                        transparent
+                    )
+                    1;
+                margin: 1.8rem 0;
+            }
+            .tips-section {
+                margin-top: 2.5rem;
+                background: linear-gradient(
+                    135deg,
+                    rgba(245, 158, 11, 0.12),
+                    rgba(251, 146, 60, 0.05)
+                );
+                border: 2px solid;
+                border-image: linear-gradient(135deg, #fbbf24, #f97316) 1;
+                border-radius: var(--radius-md);
+                padding: 2rem;
+            }
+            .tips-title {
+                display: flex;
+                align-items: center;
+                gap: 0.7rem;
+                font-size: 1.12rem;
+                font-weight: 900;
+                background: linear-gradient(90deg, #fbbf24, #f97316);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-bottom: 1.4rem;
+                letter-spacing: 0.02em;
+            }
+            .tips-list {
+                padding-left: 1.8rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.9rem;
+            }
+            .tips-list li {
+                font-size: 0.92rem;
+                background: linear-gradient(
+                    90deg,
+                    rgba(251, 191, 36, 0.95),
+                    rgba(245, 158, 11, 0.9)
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                line-height: 1.8;
+                list-style-type: disc;
+                font-weight: 500;
+            }
+
+            .word-count-badge {
+                text-align: right;
+                font-size: 0.85rem;
+                color: var(--accent-1);
+                margin-top: 1rem;
+                font-weight: 500;
+                opacity: 0.8;
+            }
+            /* ─── Enhanced Colorization for Resume Content ─── */
+            .resume-preview blockquote {
+                border-left: 5px solid var(--accent-1);
+                padding-left: 1.2rem;
+                margin: 1.5rem 0;
+                color: var(--text-primary);
+                font-style: italic;
+                background: linear-gradient(
+                    90deg,
+                    rgba(124, 58, 237, 0.1),
+                    transparent
+                );
+                padding: 1rem 1.5rem;
+                border-radius: 0 10px 10px 0;
+                position: relative;
+            }
+            .resume-preview blockquote::before {
+                content: '"';
+                position: absolute;
+                top: 5px;
+                left: 10px;
+                font-size: 3rem;
+                color: var(--accent-1);
+                opacity: 0.2;
+                font-family: serif;
+            }
+            .resume-preview h4 {
+                color: #fbbf24;
+                font-weight: 800;
+                margin: 1.2rem 0 0.6rem;
+                text-transform: uppercase;
+                font-size: 0.9rem;
+                letter-spacing: 0.05em;
+            }
+            .resume-preview h5 {
+                color: #34d399;
+                font-weight: 700;
+                margin: 1rem 0 0.5rem;
+                border-left: 3px solid #34d399;
+                padding-left: 0.8rem;
+            }
+            .resume-preview h6 {
+                color: #f472b6;
+                font-weight: 600;
+                margin: 0.8rem 0 0.4rem;
+                font-style: italic;
+            }
+            .resume-preview table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin: 1.5rem 0;
+                border: 1px solid var(--glass-border);
+                border-radius: 12px;
+                overflow: hidden;
+            }
+            .resume-preview table th {
+                background: linear-gradient(
+                    135deg,
+                    rgba(124, 58, 237, 0.2),
+                    rgba(6, 182, 212, 0.1)
+                );
+                color: var(--text-primary);
+                padding: 1rem;
+                text-align: left;
+                font-weight: 700;
+                border-bottom: 2px solid var(--accent-1);
+            }
+            .resume-preview table td {
+                padding: 0.8rem 1rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                color: var(--text-secondary);
+            }
+            .resume-preview table tr:last-child td {
+                border-bottom: none;
+            }
+            .resume-preview table tbody tr:nth-child(even) {
+                background: rgba(255, 255, 255, 0.02);
+            }
+            .resume-preview table tbody tr:hover {
+                background: rgba(124, 58, 237, 0.05);
+            }
+            .resume-preview mark {
+                background: linear-gradient(
+                    120deg,
+                    rgba(251, 191, 36, 0.4) 0%,
+                    rgba(251, 191, 36, 0.2) 100%
+                );
+                color: #fff;
+                padding: 0.1rem 0.4rem;
+                border-radius: 4px;
+                font-weight: 600;
+                box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+            }
+            .resume-preview del {
+                color: var(--danger);
+                opacity: 0.7;
+                text-decoration: line-through;
+                background: rgba(239, 68, 68, 0.1);
+                padding: 0 0.2rem;
+            }
+            .resume-preview ins {
+                color: var(--success);
+                text-decoration: none;
+                background: rgba(16, 185, 129, 0.15);
+                padding: 0.1rem 0.4rem;
+                border-radius: 3px;
+                border-bottom: 2px solid var(--success);
+            }
+            .resume-preview sup,
+            .resume-preview sub {
+                color: var(--accent-2);
+                font-size: 0.75rem;
+                font-weight: 700;
+            }
+            /* Colorful metadata for job experience and education */
+            .resume-preview li strong::before {
+                content: "✦ ";
+                background: linear-gradient(
+                    135deg,
+                    var(--accent-1),
+                    var(--accent-2)
+                );
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-right: 0.4rem;
+                font-size: 1.1rem;
+            }
+            .toast {
+                position: fixed;
+                bottom: 2rem;
+                left: 50%;
+                transform: translateX(-50%) translateY(100px);
+                background: rgba(16, 185, 129, 0.9);
+                color: white;
+                padding: 0.7rem 1.4rem;
+                border-radius: 99px;
+                font-size: 0.88rem;
+                font-weight: 600;
+                z-index: 300;
+                transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                white-space: nowrap;
+                box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+            }
+            .toast.error {
+                background: rgba(239, 68, 68, 0.9);
+                box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+            }
+            .toast.show {
+                transform: translateX(-50%) translateY(0);
+            }
+            .hidden {
+                display: none !important;
+            }
+            @keyframes fade-up {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @keyframes fade-in {
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+            @media (max-width: 640px) {
+                .form-grid {
+                    grid-template-columns: 1fr;
+                }
+                .entry-grid {
+                    grid-template-columns: 1fr;
+                }
+                .style-picker {
+                    flex-direction: column;
+                }
+                .step-panel {
+                    padding: 1.5rem;
+                }
+                .loading-card {
+                    padding: 2rem;
+                }
+                .step-label {
+                    display: none;
+                }
+            }
+
+            /* ═══════════════════════════════════════════════════════════════
+   INTERNSHIP SEARCH — styles
+   ═══════════════════════════════════════════════════════════════ */
+
+            /* ── Trigger row ── */
+            .internship-trigger {
+                margin-top: 2.5rem;
+                padding: 2rem;
+                background: linear-gradient(
+                    135deg,
+                    rgba(6, 182, 212, 0.08),
+                    rgba(124, 58, 237, 0.06)
+                );
+                border: 1.5px dashed rgba(6, 182, 212, 0.35);
+                border-radius: var(--radius-md);
+                display: flex;
+                flex-direction: column;
+                gap: 1.2rem;
+            }
+            .internship-trigger-header {
+                display: flex;
+                align-items: center;
+                gap: 0.9rem;
+            }
+            .internship-trigger-icon {
+                width: 44px;
+                height: 44px;
+                background: linear-gradient(
+                    135deg,
+                    var(--accent-2),
+                    var(--accent-1)
+                );
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.3rem;
+                flex-shrink: 0;
+            }
+            .internship-trigger-header h3 {
+                font-size: 1.1rem;
+                font-weight: 800;
+                background: linear-gradient(
+                    90deg,
+                    var(--accent-2),
+                    var(--accent-1)
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin: 0 0 0.2rem;
+            }
+            .internship-trigger-header p {
+                font-size: 0.85rem;
+                color: var(--text-muted);
+                margin: 0;
+            }
+            .internship-options {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 0.8rem;
+                align-items: end;
+            }
+            .internship-options label {
+                font-size: 0.82rem;
+                color: var(--text-muted);
+                font-weight: 600;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                display: block;
+                margin-bottom: 0.4rem;
+            }
+            .internship-options input[type="text"] {
+                width: 100%;
+                padding: 0.7rem 1rem;
+                background: rgba(255, 255, 255, 0.04);
+                border: 1.5px solid rgba(255, 255, 255, 0.1);
+                border-radius: var(--radius-sm);
+                color: var(--text-primary);
+                font-size: 0.9rem;
+                font-family: "Inter", sans-serif;
+                transition: var(--transition);
+                box-sizing: border-box;
+            }
+            .internship-options input[type="text"]:focus {
+                outline: none;
+                border-color: var(--accent-2);
+                box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+            }
+            .internship-options input[type="text"]::placeholder {
+                color: var(--text-muted);
+            }
+            .btn-search-intern {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.55rem;
+                padding: 0.72rem 1.5rem;
+                background: linear-gradient(
+                    135deg,
+                    var(--accent-2),
+                    var(--accent-1)
+                );
+                color: #fff;
+                border: none;
+                border-radius: var(--radius-sm);
+                font-size: 0.9rem;
+                font-weight: 700;
+                font-family: "Inter", sans-serif;
+                cursor: pointer;
+                transition: var(--transition);
+                white-space: nowrap;
+            }
+            .btn-search-intern:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(6, 182, 212, 0.35);
+            }
+            .btn-search-intern:disabled {
+                opacity: 0.55;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
+
+            /* ── Inline loading state ── */
+            .internship-loading {
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+                padding: 2.5rem;
+                text-align: center;
+            }
+            .internship-loading.visible {
+                display: flex;
+            }
+            .intern-spinner {
+                width: 52px;
+                height: 52px;
+                position: relative;
+            }
+            .intern-spinner::before,
+            .intern-spinner::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                border-radius: 50%;
+                border: 3px solid transparent;
+            }
+            .intern-spinner::before {
+                border-top-color: var(--accent-2);
+                animation: spin 0.9s linear infinite;
+            }
+            .intern-spinner::after {
+                border-bottom-color: var(--accent-1);
+                animation: spin 1.4s linear infinite reverse;
+            }
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+            .internship-loading p {
+                font-size: 0.92rem;
+                color: var(--text-secondary);
+                font-weight: 500;
+            }
+            .internship-loading .load-dots span {
+                display: inline-block;
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: var(--accent-2);
+                margin: 0 2px;
+                animation: bounce-dot 1.2s ease-in-out infinite;
+            }
+            .internship-loading .load-dots span:nth-child(2) {
+                animation-delay: 0.2s;
+                background: var(--accent-1);
+            }
+            .internship-loading .load-dots span:nth-child(3) {
+                animation-delay: 0.4s;
+                background: var(--accent-3);
+            }
+            @keyframes bounce-dot {
+                0%,
+                80%,
+                100% {
+                    transform: translateY(0);
+                    opacity: 0.5;
+                }
+                40% {
+                    transform: translateY(-8px);
+                    opacity: 1;
+                }
+            }
+
+            /* ── Results section ── */
+            .internship-results {
+                display: none;
+                margin-top: 2.5rem;
+                animation: fadeSlideUp 0.5s ease forwards;
+            }
+            .internship-results.visible {
+                display: block;
+            }
+            @keyframes fadeSlideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(18px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .internship-results-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 0.8rem;
+                margin-bottom: 1.6rem;
+            }
+            .internship-results-header h3 {
+                font-size: 1.12rem;
+                font-weight: 900;
+                background: linear-gradient(
+                    90deg,
+                    var(--accent-2),
+                    var(--accent-1)
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                margin: 0;
+            }
+            .internship-meta {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                background: rgba(255, 255, 255, 0.04);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 20px;
+                padding: 0.3rem 0.9rem;
+            }
+            .internship-summary {
+                font-size: 0.88rem;
+                color: var(--text-secondary);
+                line-height: 1.7;
+                padding: 1rem 1.2rem;
+                background: rgba(6, 182, 212, 0.06);
+                border-left: 3px solid var(--accent-2);
+                border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+                margin-bottom: 1.5rem;
+            }
+            .skills-chips {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.45rem;
+                margin-bottom: 1.5rem;
+            }
+            .skill-chip {
+                font-size: 0.75rem;
+                font-weight: 600;
+                padding: 0.25rem 0.75rem;
+                border-radius: 20px;
+                background: linear-gradient(
+                    135deg,
+                    rgba(124, 58, 237, 0.18),
+                    rgba(6, 182, 212, 0.12)
+                );
+                border: 1px solid rgba(124, 58, 237, 0.3);
+                color: var(--accent-2);
+            }
+            .internship-cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 1.2rem;
+            }
+            .internship-card {
+                background: linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, 0.04),
+                    rgba(255, 255, 255, 0.01)
+                );
+                border: 1.5px solid rgba(255, 255, 255, 0.08);
+                border-radius: var(--radius-md);
+                padding: 1.5rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                transition: var(--transition);
+                position: relative;
+                overflow: hidden;
+            }
+            .internship-card::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(
+                    135deg,
+                    rgba(6, 182, 212, 0.06),
+                    rgba(124, 58, 237, 0.03)
+                );
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+            .internship-card:hover {
+                border-color: rgba(6, 182, 212, 0.4);
+                transform: translateY(-3px);
+                box-shadow: 0 8px 30px rgba(6, 182, 212, 0.12);
+            }
+            .internship-card:hover::before {
+                opacity: 1;
+            }
+            .card-source-badge {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                font-size: 0.68rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                padding: 0.2rem 0.6rem;
+                border-radius: 20px;
+                background: rgba(6, 182, 212, 0.12);
+                border: 1px solid rgba(6, 182, 212, 0.25);
+                color: var(--accent-2);
+            }
+            .card-title {
+                font-size: 1rem;
+                font-weight: 800;
+                color: var(--text-primary);
+                margin: 0;
+                padding-right: 4rem;
+                line-height: 1.4;
+            }
+            .card-company {
+                font-size: 0.88rem;
+                font-weight: 600;
+                color: var(--accent-1);
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+            }
+            .card-location {
+                font-size: 0.82rem;
+                color: var(--text-muted);
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+            }
+            .card-description {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                line-height: 1.65;
+                flex: 1;
+            }
+            .card-match {
+                font-size: 0.8rem;
+                padding: 0.5rem 0.75rem;
+                background: linear-gradient(
+                    135deg,
+                    rgba(245, 158, 11, 0.1),
+                    rgba(251, 146, 60, 0.06)
+                );
+                border: 1px solid rgba(245, 158, 11, 0.2);
+                border-radius: var(--radius-sm);
+                color: #fbbf24;
+                display: flex;
+                align-items: flex-start;
+                gap: 0.4rem;
+                line-height: 1.5;
+            }
+            .card-match::before {
+                content: "✦";
+                flex-shrink: 0;
+            }
+            .card-apply-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.45rem;
+                padding: 0.6rem 1.1rem;
+                background: linear-gradient(
+                    135deg,
+                    rgba(6, 182, 212, 0.15),
+                    rgba(124, 58, 237, 0.1)
+                );
+                border: 1.5px solid rgba(6, 182, 212, 0.35);
+                border-radius: var(--radius-sm);
+                color: var(--accent-2);
+                font-size: 0.85rem;
+                font-weight: 700;
+                font-family: "Inter", sans-serif;
+                text-decoration: none;
+                cursor: pointer;
+                transition: var(--transition);
+                margin-top: auto;
+            }
+            .card-apply-btn:hover {
+                background: linear-gradient(
+                    135deg,
+                    rgba(6, 182, 212, 0.25),
+                    rgba(124, 58, 237, 0.18)
+                );
+                border-color: var(--accent-2);
+                color: #fff;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
+            }
+            .btn-refresh-search {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.55rem 1.1rem;
+                background: transparent;
+                border: 1.5px solid rgba(255, 255, 255, 0.12);
+                border-radius: var(--radius-sm);
+                color: var(--text-muted);
+                font-size: 0.82rem;
+                font-weight: 600;
+                font-family: "Inter", sans-serif;
+                cursor: pointer;
+                transition: var(--transition);
+            }
+            .btn-refresh-search:hover {
+                border-color: var(--accent-2);
+                color: var(--accent-2);
+            }
+            .serper-notice {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                font-size: 0.78rem;
+                color: var(--text-muted);
+                padding: 0.6rem 0.9rem;
+                background: rgba(245, 158, 11, 0.06);
+                border: 1px solid rgba(245, 158, 11, 0.15);
+                border-radius: var(--radius-sm);
+                margin-top: 0.8rem;
+            }
+            .serper-notice a {
+                color: #fbbf24;
+                text-decoration: none;
+                font-weight: 600;
+            }
+            .serper-notice a:hover {
+                text-decoration: underline;
+            }
+
+            @media (max-width: 640px) {
+                .internship-options {
+                    grid-template-columns: 1fr;
+                }
+                .internship-cards {
+                    grid-template-columns: 1fr;
+                }
+                .internship-results-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            }
+        </style>
+
+        <!-- Three.js ES module importmap -->
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js"
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <!-- Three.js DNA Helix background canvas -->
+        <canvas
+            id="helix-canvas"
+            style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 0;
+                pointer-events: none;
+                opacity: 1;
+            "
+        ></canvas>
+
+        <!-- Animated background orbs -->
+        <div class="bg-orbs">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+
+        <!-- Header -->
+        <header class="site-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                    >
+                        <path
+                            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                        />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                </div>
+                <span>ResumeAI</span>
+            </div>
+            <div class="header-badge">
+                <span class="pulse-dot"></span>
+                Powered by CrewAI
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <main class="main-container">
+            <!-- Hero section (shown before starting) -->
+            <section class="hero" id="hero-section">
+                <h1 class="hero-title">
+                    Craft Your <span class="gradient-text">Perfect Resume</span
+                    ><br />with AI Agents
+                </h1>
+                <p class="hero-subtitle">
+                    Two specialized AI agents collaborate to write and refine
+                    your professional resume.<br />
+                    ATS-optimized, recruiter-approved, ready in seconds.
+                </p>
+                <div class="hero-features">
+                    <div class="feature-chip">✦ Resume Writer Agent</div>
+                    <div class="feature-chip">✦ Formatter & Critic Agent</div>
+                    <div class="feature-chip">✦ ATS Optimized</div>
+                    <div class="feature-chip">✦ Instant Download</div>
+                </div>
+                <button class="btn-primary btn-large" id="start-btn">
+                    <span>Start Building My Resume</span>
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                    >
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                </button>
+            </section>
+
+            <!-- Form Container -->
+            <div class="form-container hidden" id="form-container">
+                <!-- Progress Bar -->
+                <div class="progress-wrapper">
+                    <div class="steps-nav">
+                        <div class="step-dot active" data-step="1">
+                            <span class="step-num">1</span>
+                            <span class="step-label">Personal</span>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step-dot" data-step="2">
+                            <span class="step-num">2</span>
+                            <span class="step-label">Experience</span>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step-dot" data-step="3">
+                            <span class="step-num">3</span>
+                            <span class="step-label">Education</span>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step-dot" data-step="4">
+                            <span class="step-num">4</span>
+                            <span class="step-label">Skills</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <!-- ── Step 1: Personal Info ─────────────────────────────── -->
+                <div class="step-panel active" id="step-1">
+                    <div class="step-header">
+                        <div class="step-icon">👤</div>
+                        <h2>Personal Information</h2>
+                        <p>Let's start with your basic contact details.</p>
+                    </div>
+                    <div class="form-grid">
+                        <div class="field-group">
+                            <label for="full-name"
+                                >Full Name
+                                <span class="required">*</span></label
+                            >
+                            <input
+                                id="full-name"
+                                type="text"
+                                placeholder="e.g. Jane Doe"
+                                required
+                            />
+                        </div>
+                        <div class="field-group">
+                            <label for="email"
+                                >Email Address
+                                <span class="required">*</span></label
+                            >
+                            <input
+                                id="email"
+                                type="email"
+                                placeholder="jane@example.com"
+                                required
+                            />
+                        </div>
+                        <div class="field-group">
+                            <label for="phone"
+                                >Phone Number
+                                <span class="required">*</span></label
+                            >
+                            <input
+                                id="phone"
+                                type="tel"
+                                placeholder="+1 (555) 000-0000"
+                                required
+                            />
+                        </div>
+                        <div class="field-group">
+                            <label for="location"
+                                >Location <span class="required">*</span></label
+                            >
+                            <input
+                                id="location"
+                                type="text"
+                                placeholder="e.g. San Francisco, CA"
+                                required
+                            />
+                        </div>
+                        <div class="field-group">
+                            <label for="linkedin">LinkedIn URL</label>
+                            <input
+                                id="linkedin"
+                                type="url"
+                                placeholder="https://linkedin.com/in/yourname"
+                            />
+                        </div>
+                        <div class="field-group">
+                            <label for="portfolio">Portfolio / Website</label>
+                            <input
+                                id="portfolio"
+                                type="url"
+                                placeholder="https://yourwebsite.com"
+                            />
+                        </div>
+                        <div class="field-group full-width">
+                            <label for="objective"
+                                >Career Objective / Summary
+                                <span class="required">*</span></label
+                            >
+                            <textarea
+                                id="objective"
+                                rows="4"
+                                placeholder="Describe your professional goals, key strengths, and what kind of role you're looking for…"
+                                required
+                            ></textarea>
+                            <div class="char-count">
+                                <span id="objective-count">0</span>/500
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-actions">
+                        <button class="btn-ghost" onclick="goToHero()">
+                            ← Back
+                        </button>
+                        <button class="btn-primary" onclick="nextStep(1)">
+                            Next: Experience →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── Step 2: Work Experience ───────────────────────────── -->
+                <div class="step-panel" id="step-2">
+                    <div class="step-header">
+                        <div class="step-icon">💼</div>
+                        <h2>Work Experience</h2>
+                        <p>
+                            Add your work history. The more detail you give, the
+                            better the resume.
+                        </p>
+                    </div>
+                    <div id="experience-list">
+                        <!-- entries injected by JS -->
+                    </div>
+                    <button
+                        class="btn-add"
+                        id="add-exp-btn"
+                        onclick="addExperience()"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                        >
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="16" />
+                            <line x1="8" y1="12" x2="16" y2="12" />
+                        </svg>
+                        Add Work Experience
+                    </button>
+                    <div class="step-actions">
+                        <button class="btn-ghost" onclick="prevStep(2)">
+                            ← Back
+                        </button>
+                        <button class="btn-primary" onclick="nextStep(2)">
+                            Next: Education →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── Step 3: Education ─────────────────────────────────── -->
+                <div class="step-panel" id="step-3">
+                    <div class="step-header">
+                        <div class="step-icon">🎓</div>
+                        <h2>Education</h2>
+                        <p>Add your academic background and qualifications.</p>
+                    </div>
+                    <div id="education-list">
+                        <!-- entries injected by JS -->
+                    </div>
+                    <button
+                        class="btn-add"
+                        id="add-edu-btn"
+                        onclick="addEducation()"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                        >
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="16" />
+                            <line x1="8" y1="12" x2="16" y2="12" />
+                        </svg>
+                        Add Education
+                    </button>
+                    <div class="step-actions">
+                        <button class="btn-ghost" onclick="prevStep(3)">
+                            ← Back
+                        </button>
+                        <button class="btn-primary" onclick="nextStep(3)">
+                            Next: Skills →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── Step 4: Skills & Style ────────────────────────────── -->
+                <div class="step-panel" id="step-4">
+                    <div class="step-header">
+                        <div class="step-icon">⚡</div>
+                        <h2>Skills & Style</h2>
+                        <p>Add your skills and choose a resume style.</p>
+                    </div>
+
+                    <!-- Skills input -->
+                    <div class="field-group">
+                        <label>Skills <span class="required">*</span></label>
+                        <div class="skill-input-wrapper">
+                            <input
+                                id="skill-input"
+                                type="text"
+                                placeholder="Type a skill and press Enter or comma…"
+                            />
+                        </div>
+                        <div class="skill-tags" id="skill-tags"></div>
+                        <p class="field-hint">
+                            e.g. Python, React, Project Management, Data
+                            Analysis
+                        </p>
+                    </div>
+
+                    <!-- Certifications -->
+                    <div class="field-group" style="margin-top: 1.5rem">
+                        <label
+                            >Certifications
+                            <span class="optional">(optional)</span></label
+                        >
+                        <div class="skill-input-wrapper">
+                            <input
+                                id="cert-input"
+                                type="text"
+                                placeholder="Type a certification and press Enter…"
+                            />
+                        </div>
+                        <div class="skill-tags" id="cert-tags"></div>
+                    </div>
+
+                    <!-- Template style -->
+                    <div class="field-group" style="margin-top: 1.5rem">
+                        <label>Resume Style</label>
+                        <div class="style-picker">
+                            <label class="style-card active" id="style-modern">
+                                <input
+                                    type="radio"
+                                    name="template-style"
+                                    value="modern"
+                                    checked
+                                />
+                                <div class="style-preview modern-preview">
+                                    <div class="prev-header"></div>
+                                    <div class="prev-lines">
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+                                </div>
+                                <span>Modern</span>
+                            </label>
+                            <label class="style-card" id="style-minimal">
+                                <input
+                                    type="radio"
+                                    name="template-style"
+                                    value="minimal"
+                                />
+                                <div class="style-preview minimal-preview">
+                                    <div class="prev-lines">
+                                        <div class="thick"></div>
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+                                </div>
+                                <span>Minimal</span>
+                            </label>
+                            <label class="style-card" id="style-professional">
+                                <input
+                                    type="radio"
+                                    name="template-style"
+                                    value="professional"
+                                />
+                                <div class="style-preview professional-preview">
+                                    <div class="prev-sidebar"></div>
+                                    <div class="prev-lines">
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+                                </div>
+                                <span>Professional</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <button class="btn-ghost" onclick="prevStep(4)">
+                            ← Back
+                        </button>
+                        <button
+                            class="btn-generate"
+                            id="generate-btn"
+                            onclick="generateResume()"
+                        >
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                            >
+                                <polygon
+                                    points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
+                                />
+                            </svg>
+                            Generate My Resume
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── Step 5: Result ────────────────────────────────────── -->
+                <div class="step-panel" id="step-5">
+                    <div class="step-header">
+                        <div class="step-icon">🎉</div>
+                        <h2>Your AI-Generated Resume</h2>
+                        <p>
+                            Crafted by two specialized AI agents. Review, copy,
+                            or download.
+                        </p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="result-actions">
+                        <button
+                            class="btn-find-internships"
+                            id="find-internships-btn"
+                            onclick="scrollToInternships()"
+                        >
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                            >
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            Find Internships
+                        </button>
+                        <button
+                            class="btn-action"
+                            id="copy-btn"
+                            onclick="copyResume()"
+                        >
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                            >
+                                <rect
+                                    x="9"
+                                    y="9"
+                                    width="13"
+                                    height="13"
+                                    rx="2"
+                                    ry="2"
+                                />
+                                <path
+                                    d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                                />
+                            </svg>
+                            Copy Markdown
+                        </button>
+                        <button
+                            class="btn-action"
+                            id="download-btn"
+                            onclick="downloadResume()"
+                        >
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                            >
+                                <path
+                                    d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                                />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            Download .txt
+                        </button>
+                        <button class="btn-ghost" onclick="regenerate()">
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                            >
+                                <polyline points="23 4 23 10 17 10" />
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                            </svg>
+                            Regenerate
+                        </button>
+                    </div>
+
+                    <!-- Resume preview -->
+                    <div class="resume-preview" id="resume-preview"></div>
+
+                    <!-- Tips -->
+                    <div
+                        class="tips-section"
+                        id="tips-section"
+                        style="display: none"
+                    >
+                        <h3 class="tips-title">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                            >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="8" x2="12" y2="12" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" />
+                            </svg>
+                            AI Improvement Tips
+                        </h3>
+                        <ul class="tips-list" id="tips-list"></ul>
+                    </div>
+
+                    <div class="word-count-badge" id="word-count-badge"></div>
+
+                    <!-- ── Internship Search Trigger ─────────────────────── -->
+                    <div class="internship-trigger" id="internship-trigger">
+                        <div class="internship-trigger-header">
+                            <div class="internship-trigger-icon">🔍</div>
+                            <div>
+                                <h3>Find Matching Internships</h3>
+                                <p>
+                                    Two AI agents will analyse your resume and
+                                    search live job boards for the best matches.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="internship-options">
+                            <div>
+                                <label for="intern-location"
+                                    >Preferred Location</label
+                                >
+                                <input
+                                    type="text"
+                                    id="intern-location"
+                                    placeholder="e.g. New York, Remote, London…"
+                                />
+                            </div>
+                            <div>
+                                <label>&nbsp;</label>
+                                <button
+                                    class="btn-search-intern"
+                                    id="search-intern-btn"
+                                    onclick="searchInternships()"
+                                >
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.5"
+                                    >
+                                        <circle cx="11" cy="11" r="8" />
+                                        <line
+                                            x1="21"
+                                            y1="21"
+                                            x2="16.65"
+                                            y2="16.65"
+                                        />
+                                    </svg>
+                                    Search Internships
+                                </button>
+                            </div>
+                        </div>
+
+                        <div
+                            id="serper-status-badge"
+                            style="
+                                display: none;
+                                align-items: center;
+                                gap: 0.55rem;
+                                font-size: 0.8rem;
+                                font-weight: 600;
+                                padding: 0.5rem 0.9rem;
+                                border-radius: var(--radius-sm);
+                                border: 1px solid;
+                                margin-top: 0.2rem;
+                            "
+                        ></div>
+                        <div
+                            class="serper-notice"
+                            id="serper-notice"
+                            style="display: none"
+                        >
+                            ⚡
+                            <span>
+                                For <strong>live job-board results</strong> add
+                                <code
+                                    style="
+                                        background: rgba(255, 255, 255, 0.08);
+                                        padding: 0.1rem 0.4rem;
+                                        border-radius: 4px;
+                                    "
+                                    >SERPER_API_KEY</code
+                                >
+                                to your
+                                <code
+                                    style="
+                                        background: rgba(255, 255, 255, 0.08);
+                                        padding: 0.1rem 0.4rem;
+                                        border-radius: 4px;
+                                    "
+                                    >.env</code
+                                >
+                                (free at
+                                <a
+                                    href="https://serper.dev"
+                                    target="_blank"
+                                    rel="noopener"
+                                    >serper.dev</a
+                                >). Without it, AI-curated suggestions are
+                                returned instead.
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- ── Internship inline loading ──────────────────────── -->
+                    <div class="internship-loading" id="internship-loading">
+                        <div class="intern-spinner"></div>
+                        <p id="intern-loading-msg">
+                            Agents are hunting for internships…
+                        </p>
+                        <div class="load-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+
+                    <!-- ── Internship Results ─────────────────────────────── -->
+                    <div class="internship-results" id="internship-results">
+                        <div class="internship-results-header">
+                            <h3>🎯 Matched Internships</h3>
+                            <div
+                                style="
+                                    display: flex;
+                                    gap: 0.6rem;
+                                    align-items: center;
+                                    flex-wrap: wrap;
+                                "
+                            >
+                                <span
+                                    class="internship-meta"
+                                    id="internship-meta"
+                                ></span>
+                                <button
+                                    class="btn-refresh-search"
+                                    onclick="searchInternships()"
+                                >
+                                    <svg
+                                        width="13"
+                                        height="13"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.5"
+                                    >
+                                        <polyline points="23 4 23 10 17 10" />
+                                        <path
+                                            d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"
+                                        />
+                                    </svg>
+                                    Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <p
+                            class="internship-summary"
+                            id="internship-summary"
+                        ></p>
+
+                        <div class="skills-chips" id="skills-chips"></div>
+
+                        <div
+                            class="internship-cards"
+                            id="internship-cards"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+            <!-- /form-container -->
+
+            <!-- Loading Overlay -->
+            <div class="loading-overlay hidden" id="loading-overlay">
+                <div class="loading-card">
+                    <div class="agent-animation">
+                        <div class="agent-ring"></div>
+                        <div class="agent-ring ring-2"></div>
+                        <div class="agent-icon">🤖</div>
+                    </div>
+                    <h3 id="loading-title">Agents are working…</h3>
+                    <p id="loading-subtitle">Initializing CrewAI agents</p>
+                    <div class="loading-steps">
+                        <div class="load-step" id="ls-1">
+                            <div class="load-step-dot"></div>
+                            <span>Resume Writer Agent analyzing your data</span>
+                        </div>
+                        <div class="load-step" id="ls-2">
+                            <div class="load-step-dot"></div>
+                            <span>Drafting professional resume content</span>
+                        </div>
+                        <div class="load-step" id="ls-3">
+                            <div class="load-step-dot"></div>
+                            <span>Critic Agent reviewing & polishing</span>
+                        </div>
+                        <div class="load-step" id="ls-4">
+                            <div class="load-step-dot"></div>
+                            <span>Finalizing and formatting output</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Toast notification -->
+        <div class="toast" id="toast"></div>
+
+        <!-- marked.js for Markdown rendering (pinned to stable v9.1.6) -->
+        <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+        <script>
+            // Ensure marked renders with GFM (tables, strikethrough, etc.)
+            if (typeof marked !== "undefined") {
+                marked.use({ gfm: true, breaks: false });
+            }
+        </script>
+
+        <script>
+            /* ============================================================
+   AI Resume Generator — app.js (EMBEDDED)
+   Multi-step form logic, CrewAI API integration, dynamic UI
+   ============================================================ */
+            let currentStep = 0;
+            const TOTAL_STEPS = 4;
+            const state = {
+                skills: ["Communication"],
+                certifications: [],
+                experiences: [],
+                educations: [],
+                generatedResume: "",
+            };
+            let expCounter = 0;
+            let eduCounter = 0;
+            const loadingMessages = [
+                {
+                    title: "Agents initializing…",
+                    subtitle: "Setting up CrewAI environment",
+                },
+                {
+                    title: "Writer Agent active…",
+                    subtitle: "Analyzing your career data",
+                },
+                {
+                    title: "Drafting your resume…",
+                    subtitle: "Crafting compelling bullet points",
+                },
+                {
+                    title: "Critic Agent reviewing…",
+                    subtitle: "Polishing and optimizing content",
+                },
+                {
+                    title: "Almost there…",
+                    subtitle: "Formatting the final output",
+                },
+            ];
+            document.addEventListener("DOMContentLoaded", () => {
+                addExperience();
+                addEducation();
+                const objectiveTA = document.getElementById("objective");
+                const objectiveCount =
+                    document.getElementById("objective-count");
+                objectiveTA.addEventListener("input", () => {
+                    objectiveCount.textContent = objectiveTA.value.length;
+                });
+                setupTagInput("skill-input", "skill-tags", state.skills);
+                setupTagInput("cert-input", "cert-tags", state.certifications);
+                const skillTagsEl = document.getElementById("skill-tags");
+                state.skills.forEach((skill) => {
+                    const tag = document.createElement("span");
+                    tag.className = "skill-tag";
+                    tag.innerHTML = `${escapeHtml(skill)}<button class="tag-remove" title="Remove">×</button>`;
+                    tag.querySelector(".tag-remove").addEventListener(
+                        "click",
+                        () => {
+                            const i = state.skills.indexOf(skill);
+                            if (i > -1) state.skills.splice(i, 1);
+                            tag.style.animation = "none";
+                            tag.style.transform = "scale(0)";
+                            tag.style.opacity = "0";
+                            tag.style.transition = "0.15s ease";
+                            setTimeout(() => tag.remove(), 150);
+                        },
+                    );
+                    skillTagsEl.appendChild(tag);
+                });
+                document
+                    .querySelectorAll('input[name="template-style"]')
+                    .forEach((radio) => {
+                        radio.addEventListener("change", () => {
+                            document
+                                .querySelectorAll(".style-card")
+                                .forEach((c) => c.classList.remove("active"));
+                            radio
+                                .closest(".style-card")
+                                .classList.add("active");
+                        });
+                    });
+            });
+            function goToHero() {
+                document
+                    .getElementById("form-container")
+                    .classList.add("hidden");
+                document.getElementById("hero-section").style.display = "";
+                currentStep = 0;
+                updateProgress(0);
+            }
+            document
+                .getElementById("start-btn")
+                .addEventListener("click", () => {
+                    document.getElementById("hero-section").style.display =
+                        "none";
+                    const fc = document.getElementById("form-container");
+                    fc.classList.remove("hidden");
+                    showStep(1);
+                });
+            function nextStep(from) {
+                if (!validateStep(from)) return;
+                showStep(from + 1);
+            }
+            function prevStep(from) {
+                showStep(from - 1);
+            }
+            function showStep(n) {
+                document.querySelectorAll(".step-panel").forEach((p) => {
+                    p.classList.remove("active");
+                });
+                const target = document.getElementById(`step-${n}`);
+                target.classList.add("active");
+                currentStep = n;
+                updateProgress(n);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+            function updateProgress(step) {
+                const pct =
+                    step === 0 ? 0 : ((step - 1) / (TOTAL_STEPS - 1)) * 100;
+                document.getElementById("progress-fill").style.width =
+                    `${pct}%`;
+                document.querySelectorAll(".step-dot").forEach((dot) => {
+                    const s = parseInt(dot.dataset.step);
+                    dot.classList.remove("active", "completed");
+                    if (s === step) dot.classList.add("active");
+                    if (s < step) dot.classList.add("completed");
+                });
+                document.querySelectorAll(".step-line").forEach((line, i) => {
+                    line.classList.remove("active", "completed");
+                    if (i + 1 < step) line.classList.add("completed");
+                    if (i + 1 === step - 1) line.classList.add("active");
+                });
+            }
+            function validateStep(step) {
+                if (step === 1) {
+                    const fields = [
+                        "full-name",
+                        "email",
+                        "phone",
+                        "location",
+                        "objective",
+                    ];
+                    for (const id of fields) {
+                        const el = document.getElementById(id);
+                        if (!el.value.trim()) {
+                            shakeField(el);
+                            showToast(
+                                `Please fill in: ${el.previousElementSibling.textContent.replace(" *", "")}`,
+                                "error",
+                            );
+                            return false;
+                        }
+                    }
+                }
+                if (step === 4) {
+                    if (state.skills.length === 0) {
+                        showToast("Please add at least one skill.", "error");
+                        return false;
+                    }
+                }
+                return true;
+            }
+            function shakeField(el) {
+                el.style.animation = "none";
+                el.style.borderColor = "var(--danger)";
+                el.style.boxShadow = "0 0 0 3px rgba(239,68,68,0.2)";
+                setTimeout(() => {
+                    el.style.borderColor = "";
+                    el.style.boxShadow = "";
+                }, 1500);
+            }
+            function addExperience() {
+                expCounter++;
+                const idx = expCounter;
+                state.experiences.push({ id: idx });
+                const list = document.getElementById("experience-list");
+                const card = document.createElement("div");
+                card.className = "entry-card";
+                card.id = `exp-card-${idx}`;
+                card.innerHTML = `    <div class="entry-card-header"><span class="entry-card-title">Experience #${idx}</span><button class="btn-remove" onclick="removeExperience(${idx})" title="Remove">×</button></div>    <div class="entry-grid">      <div class="field-group"><label>Company Name *</label><input type="text" id="exp-company-${idx}" placeholder="e.g. Google" /></div>      <div class="field-group"><label>Job Title / Role *</label><input type="text" id="exp-role-${idx}" placeholder="e.g. Software Engineer" /></div>      <div class="field-group"><label>Duration *</label><input type="text" id="exp-duration-${idx}" placeholder="e.g. Jan 2022 – Dec 2023" /></div>    </div>    <div class="field-group" style="margin-top:.9rem">      <label>Key Responsibilities & Achievements *</label>      <textarea id="exp-desc-${idx}" rows="3" placeholder="Describe what you did, led, built, or improved. Include metrics where possible."></textarea>    </div>  `;
+                list.appendChild(card);
+            }
+            function removeExperience(idx) {
+                const card = document.getElementById(`exp-card-${idx}`);
+                card.style.opacity = "0";
+                card.style.transform = "scale(0.95)";
+                card.style.transition = "0.2s ease";
+                setTimeout(() => {
+                    card.remove();
+                    state.experiences = state.experiences.filter(
+                        (e) => e.id !== idx,
+                    );
+                }, 200);
+            }
+            function collectExperiences() {
+                const items = document.querySelectorAll(
+                    ".entry-card[id^='exp-card-']",
+                );
+                return Array.from(items)
+                    .map((card) => {
+                        const idx = card.id.replace("exp-card-", "");
+                        return {
+                            company: (
+                                document.getElementById(`exp-company-${idx}`)
+                                    ?.value || ""
+                            ).trim(),
+                            role: (
+                                document.getElementById(`exp-role-${idx}`)
+                                    ?.value || ""
+                            ).trim(),
+                            duration: (
+                                document.getElementById(`exp-duration-${idx}`)
+                                    ?.value || ""
+                            ).trim(),
+                            description: (
+                                document.getElementById(`exp-desc-${idx}`)
+                                    ?.value || ""
+                            ).trim(),
+                        };
+                    })
+                    .filter((e) => e.company || e.role);
+            }
+            function addEducation() {
+                eduCounter++;
+                const idx = eduCounter;
+                state.educations.push({ id: idx });
+                const list = document.getElementById("education-list");
+                const card = document.createElement("div");
+                card.className = "entry-card";
+                card.id = `edu-card-${idx}`;
+                card.innerHTML = `    <div class="entry-card-header"><span class="entry-card-title">Education #${idx}</span><button class="btn-remove" onclick="removeEducation(${idx})" title="Remove">×</button></div>    <div class="entry-grid">      <div class="field-group"><label>Institution *</label><input type="text" id="edu-inst-${idx}" placeholder="e.g. MIT" /></div>      <div class="field-group"><label>Degree / Qualification *</label><input type="text" id="edu-degree-${idx}" placeholder="e.g. B.Sc. Computer Science" /></div>      <div class="field-group"><label>Year *</label><input type="text" id="edu-year-${idx}" placeholder="e.g. 2018 – 2022" /></div>      <div class="field-group"><label>GPA <span class="optional">(optional)</span></label><input type="text" id="edu-gpa-${idx}" placeholder="e.g. 3.8/4.0" /></div>    </div>  `;
+                list.appendChild(card);
+            }
+            function removeEducation(idx) {
+                const card = document.getElementById(`edu-card-${idx}`);
+                card.style.opacity = "0";
+                card.style.transform = "scale(0.95)";
+                card.style.transition = "0.2s ease";
+                setTimeout(() => {
+                    card.remove();
+                    state.educations = state.educations.filter(
+                        (e) => e.id !== idx,
+                    );
+                }, 200);
+            }
+            function collectEducations() {
+                const items = document.querySelectorAll(
+                    ".entry-card[id^='edu-card-']",
+                );
+                return Array.from(items)
+                    .map((card) => {
+                        const idx = card.id.replace("edu-card-", "");
+                        return {
+                            institution: (
+                                document.getElementById(`edu-inst-${idx}`)
+                                    ?.value || ""
+                            ).trim(),
+                            degree: (
+                                document.getElementById(`edu-degree-${idx}`)
+                                    ?.value || ""
+                            ).trim(),
+                            year: (
+                                document.getElementById(`edu-year-${idx}`)
+                                    ?.value || ""
+                            ).trim(),
+                            gpa:
+                                (
+                                    document.getElementById(`edu-gpa-${idx}`)
+                                        ?.value || ""
+                                ).trim() || null,
+                        };
+                    })
+                    .filter((e) => e.institution || e.degree);
+            }
+            function setupTagInput(inputId, tagsId, tagsArray) {
+                const input = document.getElementById(inputId);
+                const tagsEl = document.getElementById(tagsId);
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter" || e.key === ",") {
+                        e.preventDefault();
+                        addTag(
+                            input.value.replace(",", "").trim(),
+                            tagsArray,
+                            tagsEl,
+                        );
+                        input.value = "";
+                    }
+                });
+            }
+            function addTag(text, array, container) {
+                if (!text || array.includes(text)) return;
+                array.push(text);
+                const tag = document.createElement("span");
+                tag.className = "skill-tag";
+                tag.innerHTML = `${escapeHtml(text)}<button class="tag-remove" title="Remove">×</button>`;
+                tag.querySelector(".tag-remove").addEventListener(
+                    "click",
+                    () => {
+                        const i = array.indexOf(text);
+                        if (i > -1) array.splice(i, 1);
+                        tag.style.animation = "none";
+                        tag.style.transform = "scale(0)";
+                        tag.style.opacity = "0";
+                        tag.style.transition = "0.15s ease";
+                        setTimeout(() => tag.remove(), 150);
+                    },
+                );
+                container.appendChild(tag);
+            }
+            async function generateResume() {
+                if (!validateStep(4)) return;
+                const payload = {
+                    full_name: document
+                        .getElementById("full-name")
+                        .value.trim(),
+                    email: document.getElementById("email").value.trim(),
+                    phone: document.getElementById("phone").value.trim(),
+                    location: document.getElementById("location").value.trim(),
+                    linkedin:
+                        document.getElementById("linkedin").value.trim() ||
+                        null,
+                    portfolio:
+                        document.getElementById("portfolio").value.trim() ||
+                        null,
+                    objective: document
+                        .getElementById("objective")
+                        .value.trim(),
+                    experiences: collectExperiences(),
+                    education: collectEducations(),
+                    skills: [...state.skills],
+                    certifications: [...state.certifications],
+                    template_style:
+                        document.querySelector(
+                            'input[name="template-style"]:checked',
+                        )?.value || "modern",
+                };
+                showLoading();
+                try {
+                    const res = await fetch("/api/generate-resume", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    });
+                    if (!res.ok) {
+                        let errMsg = `HTTP ${res.status}`;
+                        try {
+                            const text = await res.text();
+                            if (text) {
+                                try {
+                                    const err = JSON.parse(text);
+                                    errMsg = err.detail || err.message || text;
+                                } catch (e) {
+                                    errMsg = text;
+                                }
+                            }
+                        } catch (e) {
+                            errMsg = `HTTP ${res.status}: ${e.message}`;
+                        }
+                        throw new Error(errMsg);
+                    }
+                    const data = await res.json();
+                    state.generatedResume = data.generated_resume;
+                    hideLoading();
+                    renderResult(data);
+                } catch (err) {
+                    hideLoading();
+                    showToast(`Error: ${err.message}`, "error");
+                    console.error("Generation error:", err);
+                }
+            }
+            function renderResult(data) {
+                showStep(5);
+                checkSerperStatus();
+                const preview = document.getElementById("resume-preview");
+                preview.innerHTML = marked.parse(
+                    data.generated_resume || "*(No content returned)*",
+                );
+                const tipsSection = document.getElementById("tips-section");
+                const tipsList = document.getElementById("tips-list");
+                tipsList.innerHTML = "";
+                if (data.tips && data.tips.length > 0) {
+                    tipsSection.style.display = "";
+                    data.tips.forEach((tip) => {
+                        const li = document.createElement("li");
+                        li.textContent = tip;
+                        tipsList.appendChild(li);
+                    });
+                } else {
+                    tipsSection.style.display = "none";
+                }
+                const wc = document.getElementById("word-count-badge");
+                wc.textContent = `📄 ${data.word_count || 0} words`;
+                preview.style.opacity = "0";
+                preview.style.transform = "translateY(20px)";
+                preview.style.transition = "0.5s ease";
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        preview.style.opacity = "1";
+                        preview.style.transform = "translateY(0)";
+                    });
+                });
+            }
+            function copyResume() {
+                if (!state.generatedResume) return;
+                navigator.clipboard
+                    .writeText(state.generatedResume)
+                    .then(() => {
+                        showToast("✓ Copied to clipboard!");
+                        const btn = document.getElementById("copy-btn");
+                        btn.textContent = "✓ Copied!";
+                        setTimeout(() => {
+                            btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Markdown`;
+                        }, 2000);
+                    });
+            }
+            function downloadResume() {
+                if (!state.generatedResume) return;
+                const name =
+                    document
+                        .getElementById("full-name")
+                        .value.trim()
+                        .replace(/\s+/g, "_") || "resume";
+                const blob = new Blob([state.generatedResume], {
+                    type: "text/plain",
+                });
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `${name}_resume.txt`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+                showToast("✓ Download started!");
+            }
+            function regenerate() {
+                showStep(4);
+            }
+            let loadingInterval = null;
+            let loadingStepIdx = 0;
+            function showLoading() {
+                const overlay = document.getElementById("loading-overlay");
+                overlay.classList.remove("hidden");
+                ["ls-1", "ls-2", "ls-3", "ls-4"].forEach((id) => {
+                    const el = document.getElementById(id);
+                    el.classList.remove("active", "done");
+                });
+                loadingStepIdx = 0;
+                activateLoadStep(0);
+                const stepDurations = [2500, 4000, 4000, 3000];
+                let elapsed = 0;
+                loadingInterval = setInterval(() => {
+                    elapsed += 500;
+                    if (elapsed >= stepDurations[loadingStepIdx]) {
+                        elapsed = 0;
+                        advanceLoadStep();
+                    }
+                }, 500);
+            }
+            function activateLoadStep(idx) {
+                const ids = ["ls-1", "ls-2", "ls-3", "ls-4"];
+                if (idx < ids.length) {
+                    document.getElementById(ids[idx]).classList.add("active");
+                    const msg =
+                        loadingMessages[
+                            Math.min(idx, loadingMessages.length - 1)
+                        ];
+                    document.getElementById("loading-title").textContent =
+                        msg.title;
+                    document.getElementById("loading-subtitle").textContent =
+                        msg.subtitle;
+                }
+            }
+            function advanceLoadStep() {
+                const ids = ["ls-1", "ls-2", "ls-3", "ls-4"];
+                if (loadingStepIdx < ids.length) {
+                    document
+                        .getElementById(ids[loadingStepIdx])
+                        .classList.remove("active");
+                    document
+                        .getElementById(ids[loadingStepIdx])
+                        .classList.add("done");
+                    loadingStepIdx++;
+                    if (loadingStepIdx < ids.length) {
+                        activateLoadStep(loadingStepIdx);
+                    }
+                }
+            }
+            function hideLoading() {
+                clearInterval(loadingInterval);
+                const overlay = document.getElementById("loading-overlay");
+                overlay.style.opacity = "0";
+                overlay.style.transition = "0.4s ease";
+                setTimeout(() => {
+                    overlay.classList.add("hidden");
+                    overlay.style.opacity = "";
+                    overlay.style.transition = "";
+                }, 400);
+            }
+            let toastTimeout = null;
+            function showToast(msg, type = "success") {
+                const toast = document.getElementById("toast");
+                toast.textContent = msg;
+                toast.className = `toast ${type === "error" ? "error" : ""}`;
+                void toast.offsetWidth;
+                toast.classList.add("show");
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove("show");
+                }, 3000);
+            }
+            function escapeHtml(str) {
+                const div = document.createElement("div");
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            function scrollToInternships() {
+                const trigger = document.getElementById("internship-trigger");
+                if (!trigger) return;
+                trigger.scrollIntoView({ behavior: "smooth", block: "center" });
+                // pulse the trigger box to draw attention
+                trigger.style.transition =
+                    "box-shadow 0.3s ease, border-color 0.3s ease";
+                trigger.style.borderColor = "var(--accent-2)";
+                trigger.style.boxShadow = "0 0 0 3px rgba(6,182,212,0.25)";
+                setTimeout(() => {
+                    trigger.style.borderColor = "";
+                    trigger.style.boxShadow = "";
+                }, 1800);
+                // focus the location input so the user can type immediately
+                const loc = document.getElementById("intern-location");
+                if (loc) setTimeout(() => loc.focus(), 500);
+            }
+
+            // ── Internship Search ──────────────────────────────────────────
+            const internLoadingMessages = [
+                "Profile Analyst Agent reading your resume…",
+                "Building targeted search queries…",
+                "Internship Hunter Agent searching job boards…",
+                "Ranking results by relevance…",
+                "Compiling your matches…",
+            ];
+            let internLoadInterval = null;
+            let internLoadMsgIdx = 0;
+
+            async function checkSerperStatus() {
+                const badge = document.getElementById("serper-status-badge");
+                const notice = document.getElementById("serper-notice");
+                const triggerHeader = document.querySelector(
+                    ".internship-trigger-header p",
+                );
+                try {
+                    const res = await fetch("/api/serper-status");
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    badge.style.display = "flex";
+                    if (data.active) {
+                        badge.style.background = "rgba(16,185,129,0.1)";
+                        badge.style.borderColor = "rgba(16,185,129,0.35)";
+                        badge.style.color = "#10b981";
+                        badge.innerHTML = `
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <circle cx="12" cy="12" r="10"/><polyline points="16 12 12 16 8 12"/><line x1="12" y1="8" x2="12" y2="16"/>
+                            </svg>
+                            🌐 Live Search Active — real job-board results via Serper`;
+                        if (notice) notice.style.display = "none";
+                        if (triggerHeader)
+                            triggerHeader.textContent =
+                                "Two AI agents will analyse your resume and search live job boards (LinkedIn, Indeed, Glassdoor) for the best matches.";
+                    } else {
+                        badge.style.background = "rgba(245,158,11,0.08)";
+                        badge.style.borderColor = "rgba(245,158,11,0.25)";
+                        badge.style.color = "#f59e0b";
+                        badge.innerHTML = `
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            🤖 AI Mode — curated suggestions (add SERPER_API_KEY for live search)`;
+                        if (notice) notice.style.display = "flex";
+                    }
+                } catch (_) {
+                    /* silently ignore if server is not up yet */
+                }
+            }
+
+            async function searchInternships() {
+                if (!state.generatedResume) {
+                    showToast("Please generate your resume first.", "error");
+                    return;
+                }
+
+                const btn = document.getElementById("search-intern-btn");
+                const location = document
+                    .getElementById("intern-location")
+                    .value.trim();
+
+                // Show inline loading, hide trigger & results
+                btn.disabled = true;
+                document.getElementById("internship-trigger").style.opacity =
+                    "0.5";
+                document.getElementById(
+                    "internship-trigger",
+                ).style.pointerEvents = "none";
+                document
+                    .getElementById("internship-results")
+                    .classList.remove("visible");
+
+                const loadingEl = document.getElementById("internship-loading");
+                loadingEl.classList.add("visible");
+
+                // Cycle loading messages
+                internLoadMsgIdx = 0;
+                const msgEl = document.getElementById("intern-loading-msg");
+                msgEl.textContent = internLoadingMessages[0];
+                internLoadInterval = setInterval(() => {
+                    internLoadMsgIdx =
+                        (internLoadMsgIdx + 1) % internLoadingMessages.length;
+                    msgEl.textContent = internLoadingMessages[internLoadMsgIdx];
+                }, 3500);
+
+                try {
+                    const payload = {
+                        resume_text: state.generatedResume,
+                        preferred_location: location || null,
+                        num_results: 8,
+                        extra_keywords: [],
+                    };
+
+                    const res = await fetch("/api/search-internships", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    });
+
+                    if (!res.ok) {
+                        let errMsg = `HTTP ${res.status}`;
+                        try {
+                            const text = await res.text();
+                            if (text) {
+                                try {
+                                    const err = JSON.parse(text);
+                                    errMsg = err.detail || err.message || text;
+                                } catch (_) {
+                                    errMsg = text;
+                                }
+                            }
+                        } catch (_) {
+                            /* ignore */
+                        }
+                        throw new Error(errMsg);
+                    }
+
+                    const data = await res.json();
+                    // Refresh the status badge after the search so it reflects
+                    // what mode was actually used (live vs AI).
+                    await checkSerperStatus();
+                    renderInternships(data);
+                } catch (err) {
+                    showToast(
+                        `Internship search failed: ${err.message}`,
+                        "error",
+                    );
+                    console.error("Internship search error:", err);
+                } finally {
+                    clearInterval(internLoadInterval);
+                    loadingEl.classList.remove("visible");
+                    btn.disabled = false;
+                    document.getElementById(
+                        "internship-trigger",
+                    ).style.opacity = "";
+                    document.getElementById(
+                        "internship-trigger",
+                    ).style.pointerEvents = "";
+                }
+            }
+
+            function renderInternships(data) {
+                const resultsEl = document.getElementById("internship-results");
+                const cardsEl = document.getElementById("internship-cards");
+                const summaryEl = document.getElementById("internship-summary");
+                const metaEl = document.getElementById("internship-meta");
+                const chipsEl = document.getElementById("skills-chips");
+
+                // Summary & meta
+                summaryEl.textContent =
+                    data.search_summary || "Internship search complete.";
+                const modeLabel = data.serper_active ? "🌐 Live" : "🤖 AI";
+                metaEl.textContent = `${data.total_found || 0} results · ${modeLabel}`;
+
+                // Skills chips
+                chipsEl.innerHTML = "";
+                (data.skills_detected || []).slice(0, 10).forEach((skill) => {
+                    const chip = document.createElement("span");
+                    chip.className = "skill-chip";
+                    chip.textContent = skill;
+                    chipsEl.appendChild(chip);
+                });
+
+                // Internship cards
+                cardsEl.innerHTML = "";
+                (data.internships || []).forEach((item, i) => {
+                    const card = document.createElement("div");
+                    card.className = "internship-card";
+                    card.style.animationDelay = `${i * 0.07}s`;
+
+                    // Build static card content (no button here)
+                    card.innerHTML = `
+                        <span class="card-source-badge">${escapeHtml(item.source || "Job Board")}</span>
+                        <h4 class="card-title">${escapeHtml(item.title)}</h4>
+                        <div class="card-company">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                            </svg>
+                            ${escapeHtml(item.company)}
+                        </div>
+                        <div class="card-location">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                            ${escapeHtml(item.location)}
+                        </div>
+                        <p class="card-description">${escapeHtml(item.description)}</p>
+                        <div class="card-match">${escapeHtml(item.match_reason)}</div>
+                    `;
+
+                    // Build the "View & Apply" link via DOM API so the
+                    // click handler is attached as a real event listener —
+                    // inline onclick="" in innerHTML is silently dropped by
+                    // browsers that enforce implicit CSP on dynamic markup.
+                    const applyLink = document.createElement("a");
+                    applyLink.className = "card-apply-btn";
+                    applyLink.href = item.url;
+                    applyLink.target = "_blank";
+                    applyLink.rel = "noopener noreferrer";
+                    applyLink.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                            <polyline points="15 3 21 3 21 9"/>
+                            <line x1="10" y1="14" x2="21" y2="3"/>
+                        </svg>
+                        View &amp; Apply
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:0.7;margin-left:2px;">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                            <polyline points="15 3 21 3 21 9"/>
+                            <line x1="10" y1="14" x2="21" y2="3"/>
+                        </svg>
+                    `;
+                    // Attach click handler directly on the DOM node
+                    applyLink.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        window.open(item.url, "_blank", "noopener,noreferrer");
+                    });
+
+                    card.appendChild(applyLink);
+                    cardsEl.appendChild(card);
+                });
+
+                resultsEl.classList.add("visible");
+                resultsEl.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+                showToast(`✓ Found ${data.total_found || 0} internships!`);
+            }
+        </script>
+
+        <!-- ═══════════════════════════════════════════════════════
+             THREE.JS — DNA Double-Helix Background  (ES Module)
+             ═══════════════════════════════════════════════════════ -->
+        <script type="module">
+            import * as THREE from "three";
+
+            const canvas = document.getElementById("helix-canvas");
+            if (!canvas) throw new Error("helix-canvas not found");
+
+            /* ── Renderer ── */
+            const renderer = new THREE.WebGLRenderer({
+                canvas,
+                alpha: true,
+                antialias: true,
+            });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+
+            /* ── Scene & Camera ── */
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(
+                45,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                200,
+            );
+            camera.position.set(0, 0, 26);
+
+            /* ── Lighting ── */
+            scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+
+            const pl1 = new THREE.PointLight(0x7c3aed, 4, 60);
+            pl1.position.set(10, 12, 10);
+            scene.add(pl1);
+
+            const pl2 = new THREE.PointLight(0x06b6d4, 4, 60);
+            pl2.position.set(-10, -12, 10);
+            scene.add(pl2);
+
+            const pl3 = new THREE.PointLight(0xf59e0b, 2, 50);
+            pl3.position.set(0, 0, -15);
+            scene.add(pl3);
+
+            /* ── Helix constants ── */
+            const TURNS = 5;
+            const HEIGHT = 22;
+            const RADIUS = 3.2;
+            const STEPS = 300;
+            const T_RAD = 0.085;
+            const RUNGS = 44;
+            const COLOR_A = 0x7c3aed; // purple
+            const COLOR_B = 0x06b6d4; // cyan
+
+            /* ── Strand ── */
+            function makeStrand(phase, color) {
+                const pts = [];
+                for (let i = 0; i <= STEPS; i++) {
+                    const t = i / STEPS;
+                    const θ = TURNS * Math.PI * 2 * t + phase;
+                    pts.push(
+                        new THREE.Vector3(
+                            RADIUS * Math.cos(θ),
+                            HEIGHT * (t - 0.5),
+                            RADIUS * Math.sin(θ),
+                        ),
+                    );
+                }
+                const geo = new THREE.TubeGeometry(
+                    new THREE.CatmullRomCurve3(pts),
+                    STEPS * 2,
+                    T_RAD,
+                    9,
+                    false,
+                );
+                const mat = new THREE.MeshPhongMaterial({
+                    color,
+                    emissive: color,
+                    emissiveIntensity: 0.6,
+                    transparent: true,
+                    opacity: 0.7,
+                    shininess: 90,
+                });
+                return new THREE.Mesh(geo, mat);
+            }
+
+            /* ── Rungs + spheres ── */
+            function makeRungs() {
+                const group = new THREE.Group();
+                const sGeoBase = new THREE.SphereGeometry(0.155, 10, 10);
+
+                for (let i = 0; i <= RUNGS; i++) {
+                    const t = i / RUNGS;
+                    const θ = TURNS * Math.PI * 2 * t;
+                    const y = HEIGHT * (t - 0.5);
+                    const p1 = new THREE.Vector3(
+                        RADIUS * Math.cos(θ),
+                        y,
+                        RADIUS * Math.sin(θ),
+                    );
+                    const p2 = new THREE.Vector3(
+                        RADIUS * Math.cos(θ + Math.PI),
+                        y,
+                        RADIUS * Math.sin(θ + Math.PI),
+                    );
+
+                    /* cylinder */
+                    const dir = new THREE.Vector3().subVectors(p2, p1);
+                    const len = dir.length();
+                    const mid = new THREE.Vector3()
+                        .addVectors(p1, p2)
+                        .multiplyScalar(0.5);
+                    const rung = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.028, 0.028, len, 6),
+                        new THREE.MeshPhongMaterial({
+                            color: 0xffffff,
+                            emissive: 0xffffff,
+                            emissiveIntensity: 0.15,
+                            transparent: true,
+                            opacity: 0.22,
+                        }),
+                    );
+                    rung.position.copy(mid);
+                    rung.quaternion.setFromUnitVectors(
+                        new THREE.Vector3(0, 1, 0),
+                        dir.normalize(),
+                    );
+                    group.add(rung);
+
+                    /* endpoint spheres */
+                    [
+                        [p1, COLOR_A],
+                        [p2, COLOR_B],
+                    ].forEach(([pos, col]) => {
+                        const s = new THREE.Mesh(
+                            sGeoBase.clone(),
+                            new THREE.MeshPhongMaterial({
+                                color: col,
+                                emissive: col,
+                                emissiveIntensity: 0.9,
+                                transparent: true,
+                                opacity: 0.85,
+                                shininess: 130,
+                            }),
+                        );
+                        s.position.copy(pos);
+                        group.add(s);
+                    });
+                }
+                return group;
+            }
+
+            /* ── Particles ── */
+            function makeParticles(count) {
+                const pos = new Float32Array(count * 3);
+                for (let i = 0; i < count; i++) {
+                    pos[i * 3] = (Math.random() - 0.5) * 30;
+                    pos[i * 3 + 1] = (Math.random() - 0.5) * 30;
+                    pos[i * 3 + 2] = (Math.random() - 0.5) * 15;
+                }
+                const geo = new THREE.BufferGeometry();
+                geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+                return new THREE.Points(
+                    geo,
+                    new THREE.PointsMaterial({
+                        color: 0xa78bfa,
+                        size: 0.09,
+                        transparent: true,
+                        opacity: 0.6,
+                        sizeAttenuation: true,
+                    }),
+                );
+            }
+
+            /* ── Main helix group ── */
+            const helixGroup = new THREE.Group();
+            helixGroup.add(
+                makeStrand(0, COLOR_A),
+                makeStrand(Math.PI, COLOR_B),
+                makeRungs(),
+            );
+            helixGroup.scale.setScalar(0.88);
+            scene.add(helixGroup);
+
+            /* ── Left ghost helix ── */
+            const leftGroup = new THREE.Group();
+            [makeStrand(0, COLOR_A), makeStrand(Math.PI, COLOR_B)].forEach(
+                (m) => {
+                    m.material.opacity = 0.2;
+                    leftGroup.add(m);
+                },
+            );
+            leftGroup.scale.setScalar(0.38);
+            leftGroup.position.set(-11, -2, -4);
+            leftGroup.rotation.z = 0.5;
+            scene.add(leftGroup);
+
+            /* ── Right ghost helix ── */
+            const rightGroup = new THREE.Group();
+            [makeStrand(0, COLOR_B), makeStrand(Math.PI, COLOR_A)].forEach(
+                (m) => {
+                    m.material.opacity = 0.18;
+                    rightGroup.add(m);
+                },
+            );
+            rightGroup.scale.setScalar(0.28);
+            rightGroup.position.set(12, 3, -3);
+            rightGroup.rotation.z = -0.4;
+            scene.add(rightGroup);
+
+            /* ── Particles ── */
+            const particles = makeParticles(320);
+            scene.add(particles);
+
+            /* ── Animate ── */
+            let t = 0;
+            (function animate() {
+                requestAnimationFrame(animate);
+                t += 0.0035;
+
+                helixGroup.rotation.y = t;
+                helixGroup.position.y = Math.sin(t * 0.38) * 0.7;
+                leftGroup.rotation.y = -t * 0.7;
+                rightGroup.rotation.y = t * 0.9;
+                particles.rotation.y = t * 0.05;
+                particles.rotation.x = t * 0.03;
+                pl1.intensity = 3.5 + Math.sin(t * 1.2) * 1.0;
+                pl2.intensity = 3.5 + Math.cos(t * 0.9) * 1.0;
+
+                renderer.render(scene, camera);
+            })();
+
+            /* ── Resize ── */
+            window.addEventListener("resize", () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            /* ── Pause on hidden tab ── */
+            document.addEventListener("visibilitychange", () => {
+                if (!document.hidden) renderer.setAnimationLoop(null);
+            });
+        </script>
+    </body>
+</html>
